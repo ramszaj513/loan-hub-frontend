@@ -1,5 +1,11 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function HomePage() {
   return (
@@ -49,9 +55,7 @@ function HomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full">
-              Apply Now
-            </Button>
+            <Button className="w-full">Apply Now</Button>
           </CardContent>
         </Card>
       </div>
@@ -95,7 +99,7 @@ function HomePage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
