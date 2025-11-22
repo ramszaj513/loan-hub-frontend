@@ -1,23 +1,19 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { MsalProvider } from "@azure/msal-react";
-import { PublicClientApplication } from "@azure/msal-browser";
-import { msalConfig } from "@/config/auth-config";
-import { AuthProvider } from "./context/auth-context";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "./auth/context/auth-context.tsx";
 import "./index.css";
 import App from "./App.tsx";
 
-const msalInstance = new PublicClientApplication(msalConfig);
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MsalProvider instance={msalInstance}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}>
       <BrowserRouter>
         <AuthProvider>
           <App />
         </AuthProvider>
       </BrowserRouter>
-    </MsalProvider>
+    </GoogleOAuthProvider>
   </StrictMode>
 );
