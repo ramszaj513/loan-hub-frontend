@@ -19,7 +19,7 @@ function ProfileMenu() {
   if (!isAuthenticated) {
     return (
       <div className="w-16 flex justify-end">
-        <Button variant="ghost" onClick={showLoginModal}>
+        <Button variant='ghost' onClick={showLoginModal} className="cursor-pointer">
           Sign In
         </Button>
       </div>

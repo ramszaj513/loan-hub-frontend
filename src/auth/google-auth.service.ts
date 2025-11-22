@@ -28,7 +28,7 @@ export const handleGoogleLogin = async (accessToken: string): Promise<User> => {
   // TODO: Send accessToken to your backend for verification
   // Your backend should verify the token and create/return a user
 
-  // Map Google user info to your User type
+  // Map Google user info to User type
   const user: User = {
     email: userInfo.email,
     role: "User" as const,

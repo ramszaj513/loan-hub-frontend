@@ -21,7 +21,7 @@ export function SignupModal() {
           Already have an account?{" "}
           <button
             onClick={handleLoginClick}
-            className="underline hover:text-primary"
+            className="underline hover:text-primary cursor-pointer"
           >
             Sign in
           </button>

@@ -1,3 +1,4 @@
+import { BlurText } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,13 +10,21 @@ import {
 
 function HomePage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-10 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Loan Hub</h1>
-        <p className="text-xl text-muted-foreground mb-8">
-          Your comprehensive loan management platform
-        </p>
-        <Button size="lg">Get Started</Button>
+        <div className="relative z-10 text-center px-8">
+          <BlurText
+            text="Welcome to Loan Hub"
+            delay={150}
+            animateBy="words"
+            direction="top"
+            className="text-5xl md:text-6xl font-bold mb-4 leading-tight text-center justify-center"
+          />
+          <p className="text-xl max-w-2xl mx-auto">
+            Search and compare loan options that match your needs with
+            competitive rates and fast approvals
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

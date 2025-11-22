@@ -19,7 +19,7 @@ export function SignInModal() {
           New to LoanHub?{" "}
           <button
             onClick={handleSignupClick}
-            className="underline hover:text-primary"
+            className="underline hover:text-primary cursor-pointer"
           >
             Sign up
           </button>
