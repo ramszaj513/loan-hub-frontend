@@ -2,13 +2,14 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import LoansPage from "./pages/LoansPage";
 import DocsPage from "./pages/DocsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NavigationMenuComponent from "./features/navigation/components/navigation-menu";
 import ProfileMenu from "./features/navigation/components/profile-menu";
+import { SignInModal } from "./features/login/components/sign-in-modal";
+import { SignupModal } from "./features/login/components/signup-modal";
 
 function App() {
   // Initialize theme on app load
@@ -38,13 +39,16 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/loans" element={<LoansPage />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
+
+      {/* Auth Modals */}
+      <SignInModal />
+      <SignupModal />
     </div>
   );
 }

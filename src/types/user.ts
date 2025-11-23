@@ -5,13 +5,13 @@ export interface UserProfile {
   userId: string;
   firstName: string;
   lastName: string;
+  avatarUrl?: string;
   income?: number;
   address?: string;
   dependents?: number;
 }
 
 export interface User {
-  azureAdObjectId: string;
   email: string;
   role: UserRole;
   createdAt: string;

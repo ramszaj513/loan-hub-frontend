@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/use-auth-context";
+import { useAuth } from "@/auth/context/use-auth-context";
 import type { User } from "@/types/user";
 
 export function useHasRole(allowedRoles: User["role"] | User["role"][]) {

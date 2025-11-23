@@ -11,6 +11,8 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const initializeAuth = () => {
@@ -32,9 +34,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // Login function - sets user and stores in localStorage
-  const login = (userData: User) => {
+  const login = (userData: User, token?: string) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    if (token) {
+      localStorage.setItem("token", token);
+    }
   };
 
   // Logout function - clears user and removes from localStorage
@@ -59,6 +64,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const showLoginModal = () => setIsLoginModalOpen(true);
+  const hideLoginModal = () => setIsLoginModalOpen(false);
+
+  const showSignupModal = () => setIsSignupModalOpen(true);
+  const hideSignupModal = () => setIsSignupModalOpen(false);
+
   const value: AuthContextValue = {
     user,
     isAuthenticated: !!user,
@@ -67,6 +78,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logout,
     updateUser,
     updateProfile,
+    showLoginModal,
+    hideLoginModal,
+    isLoginModalOpen,
+    showSignupModal,
+    hideSignupModal,
+    isSignupModalOpen,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
