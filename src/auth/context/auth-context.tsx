@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { User } from "@/types/user";
+import type { User } from "@/types";
 import { AuthContext } from "./auth-context-definition";
 import type { AuthContextValue } from "./auth-context-definition";
 

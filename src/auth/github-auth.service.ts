@@ -14,8 +14,8 @@ export const initiateGitHubLogin = (): void => {
 };
 
 export const handleGitHubCallback = async (code: string): Promise<void> => {
-  // TODO: Send code to your backend
-  // Your backend will exchange it for an access token with GitHub
+  // TODO: Send code to backend
+  // Backend will exchange it for an access token with GitHub
   // and return user data
 
   console.log("GitHub OAuth code:", code);

@@ -1,11 +1,11 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import HomePage from "./pages/HomePage";
-import DashboardPage from "./pages/DashboardPage";
-import LoansPage from "./pages/LoansPage";
-import DocsPage from "./pages/DocsPage";
-import SettingsPage from "./pages/SettingsPage";
+import HomePage from "./pages/home.page";
+import DashboardPage from "./pages/dashboard.page";
+import LoansPage from "./pages/loans.page";
+import DocsPage from "./pages/docs.page";
+import SettingsPage from "./pages/settings.page";
 import NavigationMenuComponent from "./features/navigation/components/navigation-menu";
 import ProfileMenu from "./features/navigation/components/profile-menu";
 import { SignInModal } from "./features/login/components/sign-in-modal";

@@ -1,4 +1,4 @@
-import { type User } from "@/types/user";
+import { type User } from "@/types";
 
 interface GoogleUserInfo {
   sub: string;
@@ -25,8 +25,8 @@ export const handleGoogleLogin = async (accessToken: string): Promise<User> => {
 
   const userInfo: GoogleUserInfo = await userInfoResponse.json();
 
-  // TODO: Send accessToken to your backend for verification
-  // Your backend should verify the token and create/return a user
+  // TODO: Send accessToken to backend for verification
+  // Backend should verify the token and create/return a user
 
   // Map Google user info to User type
   const user: User = {
