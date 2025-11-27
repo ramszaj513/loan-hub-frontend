@@ -5,7 +5,7 @@ function LoansPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="px-8 py-12">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <LoanSearchForm />
         </div>
       </div>

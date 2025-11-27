@@ -1,87 +1,131 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  Button,
   Card,
   CardContent,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui";
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { 
+  Wallet, 
+  Layers, 
+  Home, 
+  Minus, 
+  Plus, 
+  ArrowRight 
+} from "lucide-react";
 
 function LoanSearchForm() {
+  const [loanType, setLoanType] = useState("cash");
+  const [amount, setAmount] = useState(20000);
+  const [months, setMonths] = useState(48);
+
+  const handleAmountChange = (delta: number) => {
+    setAmount(prev => Math.max(1000, prev + delta));
+  };
+
+  const handleMonthsChange = (delta: number) => {
+    setMonths(prev => Math.max(3, prev + delta));
+  };
+
   return (
-    <Card className="mb-8 shadow-2xl border-2">
+    <Card className="w-full max-w-7xl mx-auto">
       <CardContent>
-        <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="amount">Loan Amount</Label>
-            <Input
-              id="amount"
-              type="number"
-              placeholder="$10,000"
-              min="1000"
-              step="1000"
-            />
-          </div>
+        <Tabs value={loanType} onValueChange={setLoanType} className="w-full">
+          {/* Standard Shadcn Tabs Look */}
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto">
+            <TabsTrigger value="cash" className="py-2">
+              <Wallet className="w-4 h-4 mr-2" />
+              Cash Loan
+            </TabsTrigger>
+            <TabsTrigger value="consolidation" className="py-2">
+              <Layers className="w-4 h-4 mr-2" />
+              Consolidation
+            </TabsTrigger>
+            <TabsTrigger value="mortgage" className="py-2">
+              <Home className="w-4 h-4 mr-2" />
+              Mortgage
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-2">
-            <Label htmlFor="type">Loan Type</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select loan type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="personal">Personal Loan</SelectItem>
-                <SelectItem value="auto">Auto Loan</SelectItem>
-                <SelectItem value="home">Home Loan</SelectItem>
-                <SelectItem value="business">Business Loan</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* We wrap the form in a generic div so it shows for all tabs, 
+              or you can move this inside TabsContent if fields differ  per loan type */}
+          <div className="mt-8 space-y-6">
+            <div className="flex flex-col md:flex-row gap-6">
+              
+              {/* Amount Input */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="amount">How much do you need?</Label>
+                <div className="flex items-center space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => handleAmountChange(-1000)}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <div className="relative flex-1">
+                    <Input 
+                      id="amount"
+                      type="number" 
+                      value={amount}
+                      onChange={(e) => setAmount(Number(e.target.value))}
+                      className="pr-12 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => handleAmountChange(1000)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="term">Loan Term</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select term" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="12">12 months</SelectItem>
-                <SelectItem value="24">24 months</SelectItem>
-                <SelectItem value="36">36 months</SelectItem>
-                <SelectItem value="48">48 months</SelectItem>
-                <SelectItem value="60">60 months</SelectItem>
-                <SelectItem value="120">10 years</SelectItem>
-                <SelectItem value="360">30 years</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              {/* Duration Input */}
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="months">For how long?</Label>
+                <div className="flex items-center space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => handleMonthsChange(-12)}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <div className="relative flex-1">
+                    <Input 
+                      id="months"
+                      type="number" 
+                      value={months}
+                      onChange={(e) => setMonths(Number(e.target.value))}
+                      className="pr-12 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">months</span>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => handleMonthsChange(12)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="credit">Credit Score</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="excellent">Excellent (750+)</SelectItem>
-                <SelectItem value="good">Good (700-749)</SelectItem>
-                <SelectItem value="fair">Fair (650-699)</SelectItem>
-                <SelectItem value="poor">Poor (600-649)</SelectItem>
-                <SelectItem value="bad">Bad (Below 600)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="md:col-span-2 lg:col-span-4">
-            <Button type="submit" className="w-full md:w-auto">
-              Search Loans
+            <Button className="w-full" size="lg">
+              See offers <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
-        </form>
+        </Tabs>
       </CardContent>
     </Card>
   );
