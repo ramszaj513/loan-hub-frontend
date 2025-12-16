@@ -1,44 +1,31 @@
 import { type User } from "@/types";
 
-interface GoogleUserInfo {
-  sub: string;
-  email: string;
-  given_name?: string;
-  family_name?: string;
-  picture?: string;
-}
+export const handleGoogleLogin = async (token: string): Promise<User> => {
+  const response = await fetch("https://your-api.com/api/auth/google-login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ googleIdToken: token }),
+  });
 
-export const handleGoogleLogin = async (accessToken: string): Promise<User> => {
-  // Get user info from Google
-  const userInfoResponse = await fetch(
-    "https://www.googleapis.com/oauth2/v3/userinfo",
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-
-  if (!userInfoResponse.ok) {
-    throw new Error("Failed to fetch Google user info");
+  if (!response.ok) {
+    throw new Error("Backend verification failed");
   }
 
-  const userInfo: GoogleUserInfo = await userInfoResponse.json();
+  const data = await response.json();
+  localStorage.setItem("token", data.token);
 
-  // TODO: Send accessToken to backend for verification
-  // Backend should verify the token and create/return a user
-
-  // Map Google user info to User type
   const user: User = {
-    email: userInfo.email,
-    role: "User" as const,
-    createdAt: new Date().toISOString(),
+    email: data.email,
+    role: data.role, 
+    createdAt: data.createdAt,
     profile: {
-      id: userInfo.sub,
-      userId: userInfo.sub,
-      firstName: userInfo.given_name || "",
-      lastName: userInfo.family_name || "",
-      avatarUrl: userInfo.picture,
+      id: data.profile.id,
+      userId: data.profile.userId,
+      firstName: data.profile.firstName,
+      lastName: data.profile.lastName,
+      avatarUrl: data.profile.picture,
     },
   };
 
