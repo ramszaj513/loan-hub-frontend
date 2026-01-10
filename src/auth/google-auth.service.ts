@@ -1,7 +1,9 @@
 import { type User } from "@/types";
 
 export const handleGoogleLogin = async (token: string): Promise<User> => {
-  const response = await fetch("https://your-api.com/api/auth/google-login", {
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+
+  const response = await fetch(`${baseUrl}/api/auth/google-login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,7 +20,7 @@ export const handleGoogleLogin = async (token: string): Promise<User> => {
 
   const user: User = {
     email: data.email,
-    role: data.role, 
+    role: data.role,
     createdAt: data.createdAt,
     profile: {
       id: data.profile.id,
