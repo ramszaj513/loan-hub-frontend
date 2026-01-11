@@ -1,8 +1,7 @@
 export type UserRole = "User" | "BankEmployee" | "Admin";
 
 export interface UserProfile {
-  id: string;
-  userId: string;
+  
   firstName: string;
   lastName: string;
   avatarUrl?: string;
@@ -12,6 +11,7 @@ export interface UserProfile {
 }
 
 export interface User {
+  userId: string;
   email: string;
   role: UserRole;
   createdAt: string;

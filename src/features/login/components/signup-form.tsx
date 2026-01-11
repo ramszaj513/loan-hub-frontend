@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks";
 import { Button, Input, Separator } from "@/components/ui";
-import { GoogleIcon } from "@/components/icons/google-icon";
-import { GitHubIcon } from "@/components/icons/github-icon";
-import { useGoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { handleGoogleLogin } from "@/auth/google-auth.service";
-import { initiateGitHubLogin } from "@/auth/github-auth.service";
+import type { User } from "@/types";
 
 function SignupForm() {
   const { login, hideSignupModal } = useAuth();
@@ -13,23 +11,21 @@ function SignupForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const googleSignup = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setIsLoading(true);
-      try {
-        const user = await handleGoogleLogin(tokenResponse.access_token);
-        login(user, tokenResponse.access_token);
-        hideSignupModal();
-      } catch (error) {
-        console.error("Google signup failed:", error);
-      } finally {
-        setIsLoading(false);
+  const onGoogleSignupSuccess = async (credentialResponse: CredentialResponse) => {
+    setIsLoading(true);
+    try {
+      if (!credentialResponse.credential) {
+        throw new Error("No credential received from Google");
       }
-    },
-    onError: (error) => {
+      const user = await handleGoogleLogin(credentialResponse.credential);
+      login(user, credentialResponse.credential);
+      hideSignupModal();
+    } catch (error) {
       console.error("Google signup failed:", error);
-    },
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleEmailSignup = async () => {
     if (!email || !password) return;
@@ -39,11 +35,17 @@ function SignupForm() {
       // TODO: Implement email signup with your backend
       console.log("Signing up with email:", email);
 
-      const user = {
-        email: email,
-        role: "User" as const,
-        createdAt: new Date().toISOString(),
-      };
+      // Placeholder implementation
+        const user: User = {
+            userId: '',
+            email: '',
+            role: 'User',
+            createdAt: '',
+            profile: {
+              firstName: '',
+              lastName: '',
+            },
+          };
 
       login(user);
       hideSignupModal();
@@ -51,14 +53,6 @@ function SignupForm() {
       console.error("Email signup failed:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGitHub = () => {
-    try {
-      initiateGitHubLogin();
-    } catch (error) {
-      console.error("GitHub signup failed:", error);
     }
   };
 
@@ -91,23 +85,19 @@ function SignupForm() {
       <div className="relative">
         <Separator />
         <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
-          Or continue with
+          Or
         </span>
       </div>
 
-      <div className="grid grid-rows-2 gap-4">
-        <Button
-          variant="outline"
-          onClick={() => googleSignup()}
-          disabled={isLoading}
-        >
-          <GoogleIcon />
-          Google
-        </Button>
-        <Button variant="outline" onClick={handleGitHub} disabled={isLoading}>
-          <GitHubIcon />
-          GitHub
-        </Button>
+      <div className="flex justify-center w-full">
+        <GoogleLogin
+          onSuccess={onGoogleSignupSuccess}
+          onError={() => console.error("Google signup failed")}
+          useOneTap
+          theme="outline"
+          shape="rectangular"
+          width="400"
+        />
       </div>
     </div>
   );

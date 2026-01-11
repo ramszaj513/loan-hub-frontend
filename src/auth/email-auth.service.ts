@@ -8,10 +8,15 @@ export const handleEmailLogin = async (email: string): Promise<User> => {
 
   // Placeholder implementation
   const user: User = {
-    email: email,
-    role: "User" as const,
-    createdAt: new Date().toISOString(),
-  };
+      userId: '',
+      email: '',
+      role: 'User',
+      createdAt: '',
+      profile: {
+        firstName: '',
+        lastName: '',
+      },
+    };
 
   return user;
 };
