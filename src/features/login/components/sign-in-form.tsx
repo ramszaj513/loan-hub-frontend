@@ -4,39 +4,46 @@ import { Button, Input, Separator } from "@/components/ui";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { handleGoogleLogin } from "@/auth/google-auth.service";
 import { handleEmailLogin } from "@/auth/email-auth.service";
+import { Label } from "@/components/ui/label";
 
 function SignInForm() {
   const { login, hideLoginModal } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const onGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
     setIsLoading(true);
+    setError(null);
     try {
       if (!credentialResponse.credential) {
         throw new Error("No credential received from Google");
       }
-      const user = await handleGoogleLogin(credentialResponse.credential);
-      login(user, credentialResponse.credential);
+      const { user, token } = await handleGoogleLogin(credentialResponse.credential);
+      login(user, token);
       hideLoginModal();
-    } catch (error) {
-      console.error("Google login failed:", error);
+    } catch (err) {
+      console.error("Google login failed:", err);
+      setError("Google login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleEmailSubmit = async () => {
-    if (!email) return;
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
 
     setIsLoading(true);
+    setError(null);
     try {
-      const user = await handleEmailLogin(email);
-      login(user);
+      const { user, token } = await handleEmailLogin(email, password);
+      login(user, token);
       hideLoginModal();
-    } catch (error) {
-      console.error("Email login failed:", error);
+    } catch (err) {
+      console.error("Email login failed:", err);
+      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -44,29 +51,47 @@ function SignInForm() {
 
   return (
     <div className="space-y-4">
-      <Input
-        type="email"
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        disabled={isLoading}
-      />
+      {error && (
+        <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+          {error}
+        </div>
+      )}
 
-      <Input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={isLoading}
-      />
+      <form onSubmit={handleEmailSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="signin-email">Email</Label>
+          <Input
+            id="signin-email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            autoComplete="email"
+          />
+        </div>
 
-      <Button
-        onClick={handleEmailSubmit}
-        className="w-full"
-        disabled={isLoading || !email || !password}
-      >
-        Sign In
-      </Button>
+        <div className="space-y-2">
+          <Label htmlFor="signin-password">Password</Label>
+          <Input
+            id="signin-password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            autoComplete="current-password"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isLoading || !email || !password}
+        >
+          {isLoading ? "Signing in..." : "Sign In"}
+        </Button>
+      </form>
 
       <div className="relative">
         <Separator />
@@ -78,8 +103,10 @@ function SignInForm() {
       <div className="flex justify-center w-full">
         <GoogleLogin
           onSuccess={onGoogleLoginSuccess}
-          onError={() => console.error("Google login failed")}
-          useOneTap
+          onError={() => {
+            console.error("Google login failed");
+            setError("Google login failed. Please try again.");
+          }}
           theme="outline"
           shape="rectangular"
           width="400"

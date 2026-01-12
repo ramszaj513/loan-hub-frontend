@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui";
 import SignInForm from "./sign-in-form";
 
 export function SignInModal() {
@@ -14,6 +14,9 @@ export function SignInModal() {
     <Dialog open={isLoginModalOpen} onOpenChange={hideLoginModal}>
       <DialogContent className="sm:max-w-md">
         <DialogTitle className="text-2xl text-center">Sign in</DialogTitle>
+        <DialogDescription className="sr-only">
+          Sign in to your LoanHub account using email or Google
+        </DialogDescription>
         <SignInForm />
         <div className="text-center text-xs text-muted-foreground mt-4">
           New to LoanHub?{" "}

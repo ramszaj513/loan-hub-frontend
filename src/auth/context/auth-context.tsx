@@ -55,10 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // Update user profile specifically
-  const updateProfile = (profile: User["profile"]) => {
+  // Update user data specifically
+  const updateUserData = (userData: User["userData"]) => {
     if (user) {
-      const updatedUser = { ...user, profile };
+      const updatedUser = { ...user, userData };
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
     }
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     logout,
     updateUser,
-    updateProfile,
+    updateUserData,
     showLoginModal,
     hideLoginModal,
     isLoginModalOpen,
