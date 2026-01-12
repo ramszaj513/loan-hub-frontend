@@ -19,7 +19,7 @@ import { useAuth } from "@/hooks";
 
 function SettingsPage() {
   const [currentTheme, setCurrentTheme] = useState<string>("");
-  const {isAuthenticated, user} = useAuth();
+  const {isAuthenticated} = useAuth();
 
   // Initialize theme state and listen for changes
   useEffect(() => {
@@ -97,32 +97,6 @@ function SettingsPage() {
             </p>
           </CardContent>
         </Card>
-
-        {/* Profile Settings */}
-        {isAuthenticated && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile</CardTitle>
-              <CardDescription>Manage your account information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Display Name</Label>
-                <div className="text-sm text-muted-foreground">
-                  {`${user?.profile?.firstName || "-"} ${user?.profile?.lastName || "-"}`}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="text-sm text-muted-foreground">
-                  {user?.email}
-                </div>
-              </div>
-              <Button variant="outline">Edit Profile</Button>
-            </CardContent>
-          </Card>
-        )}
-
         
         {/* Notification Settings */}
         {isAuthenticated && (

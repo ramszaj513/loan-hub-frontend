@@ -6,6 +6,7 @@ import DashboardPage from "./pages/dashboard.page";
 import LoansPage from "./pages/loans.page";
 import DocsPage from "./pages/docs.page";
 import SettingsPage from "./pages/settings.page";
+import ProfilePage from "./pages/profile.page";
 import NavigationMenuComponent from "./features/navigation/components/navigation-menu";
 import ProfileMenu from "./features/navigation/components/profile-menu";
 import { SignInModal } from "./features/login/components/sign-in-modal";
@@ -43,6 +44,7 @@ function App() {
           <Route path="/loans" element={<LoansPage />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </main>
 
