@@ -6,22 +6,13 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import { 
-  Wallet, 
-  Layers, 
-  Home, 
   Minus, 
   Plus, 
   ArrowRight 
 } from "lucide-react";
 
 function LoanSearchForm() {
-  const [loanType, setLoanType] = useState("cash");
   const [amount, setAmount] = useState(20000);
   const [months, setMonths] = useState(48);
 
@@ -36,26 +27,7 @@ function LoanSearchForm() {
   return (
     <Card className="w-full max-w-7xl mx-auto">
       <CardContent>
-        <Tabs value={loanType} onValueChange={setLoanType} className="w-full">
-          {/* Standard Shadcn Tabs Look */}
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto">
-            <TabsTrigger value="cash" className="py-2">
-              <Wallet className="w-4 h-4 mr-2" />
-              Cash Loan
-            </TabsTrigger>
-            <TabsTrigger value="consolidation" className="py-2">
-              <Layers className="w-4 h-4 mr-2" />
-              Consolidation
-            </TabsTrigger>
-            <TabsTrigger value="mortgage" className="py-2">
-              <Home className="w-4 h-4 mr-2" />
-              Mortgage
-            </TabsTrigger>
-          </TabsList>
-
-          {/* We wrap the form in a generic div so it shows for all tabs, 
-              or you can move this inside TabsContent if fields differ  per loan type */}
-          <div className="mt-8 space-y-6">
+        <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
               
               {/* Amount Input */}
@@ -125,7 +97,6 @@ function LoanSearchForm() {
               See offers <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
-        </Tabs>
       </CardContent>
     </Card>
   );
