@@ -21,13 +21,12 @@ export interface UserDataDto {
   incomeCurrency: string;
 }
 
-export async function getUserData(userId: string): Promise<UserDataDto | null> {
-  const response = await fetch(`${API_URL}/api/Users/${userId}/data`, {
+export async function getUserData(): Promise<UserDataDto | null> {
+  const response = await fetch(`${API_URL}/api/Users/data`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
 
-  // User doesn't have data yet - this is not an error
   if (response.status === 404) {
     return null;
   }
@@ -39,11 +38,8 @@ export async function getUserData(userId: string): Promise<UserDataDto | null> {
   return await response.json();
 }
 
-export async function createUserData(
-  userId: string,
-  data: UserDataDto
-): Promise<UserDataDto> {
-  const response = await fetch(`${API_URL}/api/Users/${userId}/data`, {
+export async function createUserData(data: UserDataDto): Promise<UserDataDto> {
+  const response = await fetch(`${API_URL}/api/Users/data`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -56,11 +52,8 @@ export async function createUserData(
   return await response.json();
 }
 
-export async function updateUserData(
-  userId: string,
-  data: UserDataDto
-): Promise<UserDataDto> {
-  const response = await fetch(`${API_URL}/api/Users/${userId}/data`, {
+export async function updateUserData(data: UserDataDto): Promise<UserDataDto> {
+  const response = await fetch(`${API_URL}/api/Users/data`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),

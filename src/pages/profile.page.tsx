@@ -40,7 +40,7 @@ function ProfilePage() {
       }
 
       try {
-        const data = await getUserData(user.userId);
+        const data = await getUserData();
         setUserData(data);
 
         if (data) {
@@ -89,10 +89,10 @@ function ProfilePage() {
       };
 
       if (userData) {
-        const updated = await updateUserData(user.userId, dataToSave);
+        const updated = await updateUserData(dataToSave);
         setUserData(updated);
       } else {
-        const created = await createUserData(user.userId, dataToSave);
+        const created = await createUserData(dataToSave);
         setUserData(created);
       }
 
