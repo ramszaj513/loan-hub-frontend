@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks";
 import { Button, Input, Separator } from "@/components/ui";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
@@ -12,6 +12,16 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains("dark"));
+
+  // Listen for theme changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   const onGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
     setIsLoading(true);
@@ -107,7 +117,7 @@ function SignInForm() {
             console.error("Google login failed");
             setError("Google login failed. Please try again.");
           }}
-          theme="outline"
+          theme={isDark ? "filled_black" : "outline"}
           shape="rectangular"
           width="400"
         />

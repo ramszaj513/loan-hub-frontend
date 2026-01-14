@@ -5,54 +5,83 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import { useLocation, Link } from "react-router-dom";
+import { Logo } from "@/components/icons/logo";
+import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
 function NavigationMenuComponent() {
   const location = useLocation();
+  const [isDark, setIsDark] = useState(false);
 
-  const linkClassName = (path: string) =>
-    `group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-      location.pathname === path
-        ? "bg-accent text-accent-foreground"
-        : ""
-    }`;
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    setIsDark(savedTheme === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = isDark ? "light" : "dark";
+    setIsDark(!isDark);
+    localStorage.setItem("theme", newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  const navItems = [
+    { path: "/loans", label: "Loans" },
+    { path: "/dashboard", label: "Dashboard" },
+    { path: "/docs", label: "Docs" },
+  ];
 
   return (
-    <div className="flex-1 flex justify-center">
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/docs" className={linkClassName("/docs")}>
-                Docs
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/" className={linkClassName("/")}>
-                Home
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/loans" className={linkClassName("/loans")}>
-                Loans
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/dashboard" className={linkClassName("/dashboard")}>
-                Dashboard
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
+    <div className="flex items-center flex-1">
+      {/* Logo - Left */}
+      <Link to="/">
+        <Logo />
+      </Link>
+
+      {/* Navigation Links - Centered */}
+      <div className="flex-1 flex justify-center">
+        <NavigationMenu>
+          <NavigationMenuList className="gap-1">
+            {navItems.map((item) => (
+              <NavigationMenuItem key={item.path}>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to={item.path}
+                    className={`inline-flex h-9 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
+                      location.pathname === item.path
+                        ? "bg-secondary text-secondary-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+
+      {/* Dark Mode Toggle - Right */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleTheme}
+        className="rounded-full"
+      >
+        {isDark ? (
+          <Sun className="h-5 w-5" />
+        ) : (
+          <Moon className="h-5 w-5" />
+        )}
+      </Button>
     </div>
   );
 }
 
 export default NavigationMenuComponent;
-
