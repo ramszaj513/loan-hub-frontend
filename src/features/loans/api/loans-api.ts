@@ -61,7 +61,26 @@ export const getQuotes = async (params: QuoteRequest): Promise<QuoteResponse[]> 
     return response.json();
 };
 
+const currencyToEnumIndex: Record<string, number> = {
+    "USD": 0, "EUR": 1, "GBP": 2, "JPY": 3, "AUD": 4,
+    "CAD": 5, "CHF": 6, "CNY": 7, "SEK": 8, "NZD": 9
+};
+
 export const applyForLoan = async (data: LoanApplicationRequest): Promise<LoanApplicationResponse> => {
+    const applicationData = {
+        ExternalQuoteId: data.externalQuoteId,
+        FirstName: data.firstName,
+        LastName: data.lastName,
+        BirthDate: data.birthDate,
+        GovernmentDocTypeId: data.governmentDocTypeId,
+        GovernmentDocNumber: data.governmentDocNumber,
+        JobTypeId: data.jobTypeId,
+        JobStartDate: data.jobStartDate,
+        JobEndDate: data.jobEndDate || null,
+        IncomeAmount: data.incomeAmount,
+        Currency: currencyToEnumIndex[data.currency] ?? 0
+    };
+
     const response = await fetch(`${baseUrl}/api/Loans/apply`, {
         method: "POST",
         headers: {
@@ -69,7 +88,7 @@ export const applyForLoan = async (data: LoanApplicationRequest): Promise<LoanAp
             "Accept": "text/plain",
             ...getAuthHeaders(),
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(applicationData),
     });
 
     if (!response.ok) {
