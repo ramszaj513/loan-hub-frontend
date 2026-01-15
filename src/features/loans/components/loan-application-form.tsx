@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks";
 import { Button } from "@/components/ui/button";
@@ -109,16 +108,34 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
 
   if (success) {
     return (
-      <Card className="max-w-xl mx-auto border-green-200 bg-green-50/50">
-        <CardContent className="pt-6 text-center space-y-4">
+      <Card className="max-w-xl mx-auto border border-border/50 bg-card/80 backdrop-blur-sm shadow-xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 pointer-events-none" />
+        <CardContent className="relative pt-10 pb-8 text-center space-y-6">
+          {/* Animated success icon */}
           <div className="flex justify-center">
-            <CheckCircle2 className="h-16 w-16 text-green-500" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-emerald-500/20 dark:bg-emerald-400/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative h-20 w-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-400 dark:to-teal-400 flex items-center justify-center shadow-lg">
+                <CheckCircle2 className="h-10 w-10 text-white" strokeWidth={2.5} />
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-green-700">Application Submitted!</h2>
-          <p className="text-muted-foreground">
-            Your loan application for <strong>{offer.bankName}</strong> has been received clearly.
-          </p>
-          <Button onClick={() => window.location.href = "/loans"} variant="outline" className="mt-4">
+          
+          {/* Title with gradient */}
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+              Application Submitted!
+            </h2>
+            <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+              Your loan application for <span className="font-semibold text-foreground">{offer.bankName}</span> has been successfully received.
+            </p>
+          </div>
+
+          {/* Action button */}
+          <Button 
+            onClick={() => window.location.href = "/loans"} 
+            className="mt-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-500 dark:to-teal-500 dark:hover:from-emerald-600 dark:hover:to-teal-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
+          >
             Back to Loans
           </Button>
         </CardContent>
