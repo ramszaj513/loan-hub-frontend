@@ -1,106 +1,152 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks";
 import { Button, Input, Separator } from "@/components/ui";
-import { GoogleIcon } from "@/components/icons/google-icon";
-import { GitHubIcon } from "@/components/icons/github-icon";
-import { useGoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { handleGoogleLogin } from "@/auth/google-auth.service";
 import { handleEmailLogin } from "@/auth/email-auth.service";
-import { initiateGitHubLogin } from "@/auth/github-auth.service";
+import { Label } from "@/components/ui/label";
+import { getUserData } from "@/features/profile/api/user-data.api";
 
 function SignInForm() {
   const { login, hideLoginModal } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains("dark"));
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setIsLoading(true);
-      try {
-        const user = await handleGoogleLogin(tokenResponse.access_token);
-        login(user, tokenResponse.access_token);
-        hideLoginModal();
-      } catch (error) {
-        console.error("Google login failed:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    onError: (error) => {
-      console.error("Google login failed:", error);
-    },
-  });
+  // Listen for theme changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
-  const handleEmailSubmit = async () => {
-    if (!email) return;
-
+  const onGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
     setIsLoading(true);
+    setError(null);
     try {
-      const user = await handleEmailLogin(email);
-      login(user);
+      if (!credentialResponse.credential) {
+        throw new Error("No credential received from Google");
+      }
+      const { user, token } = await handleGoogleLogin(credentialResponse.credential);
+      
+      // Fetch user profile data
+      localStorage.setItem("token", token); // Token needed for getUserData
+      try {
+        const userData = await getUserData();
+        if (userData) {
+          user.userData = { ...userData, id: user.userId, userId: user.userId };
+        }
+      } catch (profileError) {
+        console.warn("Failed to fetch user profile:", profileError);
+        // Continue login even if profile fetch fails
+      }
+
+      login(user, token);
       hideLoginModal();
-    } catch (error) {
-      console.error("Email login failed:", error);
+    } catch (err) {
+      console.error("Google login failed:", err);
+      setError("Google login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGitHub = () => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+
+    setIsLoading(true);
+    setError(null);
     try {
-      initiateGitHubLogin();
-    } catch (error) {
-      console.error("GitHub login failed:", error);
+      const { user, token } = await handleEmailLogin(email, password);
+      
+      // Fetch user profile data
+      localStorage.setItem("token", token); // Token needed for getUserData
+      try {
+        const userData = await getUserData();
+        if (userData) {
+           user.userData = { ...userData, id: user.userId, userId: user.userId };
+        }
+      } catch (profileError) {
+        console.warn("Failed to fetch user profile:", profileError);
+      }
+
+      login(user, token);
+      hideLoginModal();
+    } catch (err) {
+      console.error("Email login failed:", err);
+      setError(err instanceof Error ? err.message : "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="space-y-4">
-      <Input
-        type="email"
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        disabled={isLoading}
-      />
+      {error && (
+        <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+          {error}
+        </div>
+      )}
 
-      <Input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={isLoading}
-      />
+      <form onSubmit={handleEmailSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="signin-email">Email</Label>
+          <Input
+            id="signin-email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            autoComplete="email"
+          />
+        </div>
 
-      <Button
-        onClick={handleEmailSubmit}
-        className="w-full"
-        disabled={isLoading || !email || !password}
-      >
-        Sign In
-      </Button>
+        <div className="space-y-2">
+          <Label htmlFor="signin-password">Password</Label>
+          <Input
+            id="signin-password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            autoComplete="current-password"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isLoading || !email || !password}
+        >
+          {isLoading ? "Signing in..." : "Sign In"}
+        </Button>
+      </form>
 
       <div className="relative">
         <Separator />
         <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-xs text-muted-foreground">
-          Or continue with
+          Or
         </span>
       </div>
 
-      <div className="grid grid-rows-2 gap-4">
-        <Button
-          variant="outline"
-          onClick={() => googleLogin()}
-          disabled={isLoading}
-        >
-          <GoogleIcon />
-          Google
-        </Button>
-        <Button variant="outline" onClick={handleGitHub} disabled={isLoading}>
-          <GitHubIcon />
-          GitHub
-        </Button>
+      <div className="flex justify-center w-full">
+        <GoogleLogin
+          onSuccess={onGoogleLoginSuccess}
+          onError={() => {
+            console.error("Google login failed");
+            setError("Google login failed. Please try again.");
+          }}
+          theme={isDark ? "filled_black" : "outline"}
+          shape="rectangular"
+          width="400"
+        />
       </div>
     </div>
   );

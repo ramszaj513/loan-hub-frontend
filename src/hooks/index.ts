@@ -4,4 +4,4 @@ export {
   useIsAdmin,
   useIsBankEmployee,
   useHasProfile,
-} from "./useAuth";
+} from "./auth-hooks";

@@ -1,11 +1,11 @@
 import { createContext } from "react";
-import type { User, AuthState } from "@/types/user";
+import type { User, AuthState } from "@/types";
 
 export interface AuthContextValue extends AuthState {
   login: (user: User, token?: string) => void;
   logout: () => void;
   updateUser: (user: User) => void;
-  updateProfile: (profile: User["profile"]) => void;
+  updateUserData: (userData: User["userData"]) => void;
   showLoginModal: () => void;
   hideLoginModal: () => void;
   isLoginModalOpen: boolean;

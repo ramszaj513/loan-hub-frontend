@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { User } from "@/types/user";
+import type { User } from "@/types";
 import { AuthContext } from "./auth-context-definition";
 import type { AuthContextValue } from "./auth-context-definition";
 
@@ -55,10 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // Update user profile specifically
-  const updateProfile = (profile: User["profile"]) => {
+  // Update user data specifically
+  const updateUserData = (userData: User["userData"]) => {
     if (user) {
-      const updatedUser = { ...user, profile };
+      const updatedUser = { ...user, userData };
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
     }
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     logout,
     updateUser,
-    updateProfile,
+    updateUserData,
     showLoginModal,
     hideLoginModal,
     isLoginModalOpen,

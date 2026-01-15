@@ -1,2 +1,2 @@
-export * from "./loan-offer";
-export * from "./loan-search-request";
+export * from "./loan-offer.type.ts";
+export * from "./loan-search-request.type.ts";

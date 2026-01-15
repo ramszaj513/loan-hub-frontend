@@ -1,46 +1,51 @@
-import { type User } from "@/types/user";
+import { type User } from "@/types";
 
-interface GoogleUserInfo {
-  sub: string;
-  email: string;
-  given_name?: string;
-  family_name?: string;
-  picture?: string;
+function parseJwt(token: string): { sub: string; email: string; preferred_username?: string; role: string; provider: string } {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  );
+  return JSON.parse(jsonPayload);
 }
 
-export const handleGoogleLogin = async (accessToken: string): Promise<User> => {
-  // Get user info from Google
-  const userInfoResponse = await fetch(
-    "https://www.googleapis.com/oauth2/v3/userinfo",
-    {
+export const handleGoogleLogin = async (idToken: string): Promise<{ user: User; token: string }> => {
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+
+  try {
+    const response = await fetch(`${baseUrl}/api/Auth/google-login`, {
+      method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Backend verification failed");
     }
-  );
 
-  if (!userInfoResponse.ok) {
-    throw new Error("Failed to fetch Google user info");
+    const data = await response.json();
+    const token = data.token;
+
+    localStorage.setItem("token", token);
+
+    const claims = parseJwt(token);
+
+    const user: User = {
+      userId: claims.sub,
+      email: claims.email,
+      username: claims.preferred_username,
+      role: claims.role as User["role"],
+      userData: undefined,
+    };
+
+    return { user, token };
+  } catch (err) {
+    console.error("Fetch error inside service:", err);
+    throw err;
   }
-
-  const userInfo: GoogleUserInfo = await userInfoResponse.json();
-
-  // TODO: Send accessToken to your backend for verification
-  // Your backend should verify the token and create/return a user
-
-  // Map Google user info to User type
-  const user: User = {
-    email: userInfo.email,
-    role: "User" as const,
-    createdAt: new Date().toISOString(),
-    profile: {
-      id: userInfo.sub,
-      userId: userInfo.sub,
-      firstName: userInfo.given_name || "",
-      lastName: userInfo.family_name || "",
-      avatarUrl: userInfo.picture,
-    },
-  };
-
-  return user;
 };
