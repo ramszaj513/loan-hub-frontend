@@ -5,6 +5,7 @@ import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import { handleGoogleLogin } from "@/auth/google-auth.service";
 import { handleEmailRegister, handleEmailLogin } from "@/auth/email-auth.service";
 import { Label } from "@/components/ui/label";
+import { getUserData } from "@/features/profile/api/user-data.api";
 
 function SignupForm() {
   const { login, hideSignupModal } = useAuth();
@@ -34,6 +35,18 @@ function SignupForm() {
         throw new Error("No credential received from Google");
       }
       const { user, token } = await handleGoogleLogin(credentialResponse.credential);
+      
+      // Fetch user profile data
+      localStorage.setItem("token", token);
+      try {
+        const userData = await getUserData();
+        if (userData) {
+          user.userData = { ...userData, id: user.userId, userId: user.userId };
+        }
+      } catch (profileError) {
+        console.warn("Failed to fetch user profile:", profileError);
+      }
+
       login(user, token);
       hideSignupModal();
     } catch (err) {
@@ -53,6 +66,18 @@ function SignupForm() {
     try {
       await handleEmailRegister(email, password, username);
       const { user, token } = await handleEmailLogin(email, password);
+      
+      // Fetch user profile data
+      localStorage.setItem("token", token); 
+      try {
+        const userData = await getUserData();
+        if (userData) {
+           user.userData = { ...userData, id: user.userId, userId: user.userId };
+        }
+      } catch (profileError) {
+        console.warn("Failed to fetch user profile:", profileError);
+      }
+
       login(user, token);
       hideSignupModal();
     } catch (err) {

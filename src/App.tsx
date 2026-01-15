@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import HomePage from "./pages/home.page";
 import DashboardPage from "./pages/dashboard.page";
 import LoansPage from "./pages/loans.page";
+import LoanApplicationPage from "./pages/loan-application.page";
 import DocsPage from "./pages/docs.page";
 import SettingsPage from "./pages/settings.page";
 import ProfilePage from "./pages/profile.page";
@@ -13,6 +14,8 @@ import { SignInModal } from "./features/login/components/sign-in-modal";
 import { SignupModal } from "./features/login/components/signup-modal";
 import { Logo } from "./components/icons/logo";
 import { Link } from "react-router-dom";
+
+import { ScrollToTop } from "./components/scroll-to-top";
 
 function App() {
   // Initialize theme on app load
@@ -27,6 +30,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <ScrollToTop />
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
         <div className="flex items-center h-16 px-8 gap-4">
@@ -41,6 +45,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/loans" element={<LoansPage />} />
+          <Route path="/loans/apply" element={<LoanApplicationPage />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/profile" element={<ProfilePage />} />

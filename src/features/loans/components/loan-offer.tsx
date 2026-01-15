@@ -10,6 +10,8 @@ export interface LoanOfferData {
   apr: number;
   maxAmount: number;
   termRange: string;
+  currency: string;
+  monthlyInstallment?: number;
 }
 
 interface LoanOfferCardProps {
@@ -77,6 +79,7 @@ export const sampleOffers: LoanOfferData[] = [
     apr: 3.8,
     maxAmount: 50000,
     termRange: "12-60 mo",
+    currency: "USD",
   },
   {
     id: "2",
@@ -86,6 +89,7 @@ export const sampleOffers: LoanOfferData[] = [
     apr: 4.2,
     maxAmount: 75000,
     termRange: "24-84 mo",
+    currency: "USD",
   },
   {
     id: "3",
@@ -95,6 +99,7 @@ export const sampleOffers: LoanOfferData[] = [
     apr: 5.5,
     maxAmount: 35000,
     termRange: "12-48 mo",
+    currency: "USD",
   },
   {
     id: "4",
@@ -104,6 +109,7 @@ export const sampleOffers: LoanOfferData[] = [
     apr: 6.1,
     maxAmount: 40000,
     termRange: "24-60 mo",
+    currency: "USD",
   },
   {
     id: "5",
@@ -113,6 +119,7 @@ export const sampleOffers: LoanOfferData[] = [
     apr: 4.8,
     maxAmount: 60000,
     termRange: "12-72 mo",
+    currency: "USD",
   },
   {
     id: "6",
@@ -122,15 +129,22 @@ export const sampleOffers: LoanOfferData[] = [
     apr: 5.9,
     maxAmount: 30000,
     termRange: "12-36 mo",
+    currency: "USD",
   },
 ];
 
+
+interface LoanOfferProps {
+  offers?: LoanOfferData[];
+  onSelect?: (offer: LoanOfferData) => void;
+}
+
 // Default export for backwards compatibility
-function LoanOffer() {
+function LoanOffer({ offers = sampleOffers, onSelect }: LoanOfferProps) {
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {sampleOffers.map((offer) => (
-        <LoanOfferCard key={offer.id} offer={offer} />
+      {offers.map((offer) => (
+        <LoanOfferCard key={offer.id} offer={offer} onSelect={onSelect} />
       ))}
     </div>
   );

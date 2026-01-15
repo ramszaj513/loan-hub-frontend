@@ -22,5 +22,5 @@ export function useIsBankEmployee() {
 
 export function useHasProfile() {
   const { user } = useAuth();
-  return !!(user?.profile?.firstName && user?.profile?.lastName);
+  return !!(user?.userData?.firstName && user?.userData?.lastName);
 }
