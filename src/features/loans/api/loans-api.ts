@@ -98,3 +98,50 @@ export const applyForLoan = async (data: LoanApplicationRequest): Promise<LoanAp
 
     return response.json();
 };
+
+export const BankOfferStatus = {
+    Pending: 0,
+    Approved: 1,
+    Rejected: 2,
+    RequiresMoreInfo: 3
+} as const;
+
+export type BankOfferStatus = typeof BankOfferStatus[keyof typeof BankOfferStatus];
+
+export interface ApplicationStatus {
+    status: BankOfferStatus;
+    description: string | null;
+    lastUpdated: string;
+}
+
+export const getUserApplications = async (): Promise<ApplicationStatus[]> => {
+    const response = await fetch(`${baseUrl}/api/Loans/applications`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            ...getAuthHeaders(),
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch applications: ${response.statusText}`);
+    }
+
+    return response.json();
+};
+
+export const getApplicationStatus = async (applicationId: string): Promise<ApplicationStatus> => {
+    const response = await fetch(`${baseUrl}/api/Loans/applications/${applicationId}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            ...getAuthHeaders(),
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch application status: ${response.statusText}`);
+    }
+
+    return response.json();
+};
