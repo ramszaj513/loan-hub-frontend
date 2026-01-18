@@ -5,12 +5,16 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import { useLocation, Link } from "react-router-dom";
-import { Logo } from "@/components/icons/logo";
-import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { Logo } from "@/components/icons/logo";
+import { Moon, Sun } from "lucide-react";
+import { useAuth } from "@/hooks";
+
+
 
 function NavigationMenuComponent() {
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
   const [isDark, setIsDark] = useState(false);
 
@@ -30,9 +34,11 @@ function NavigationMenuComponent() {
     }
   };
 
+
+
   const navItems = [
     { path: "/loans", label: "Loans" },
-    { path: "/dashboard", label: "Dashboard" },
+    ...(isAuthenticated ? [{ path: "/dashboard", label: "Dashboard" }] : []),
     { path: "/docs", label: "Docs" },
   ];
 

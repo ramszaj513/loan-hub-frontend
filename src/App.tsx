@@ -14,6 +14,8 @@ import { SignInModal } from "./features/login/components/sign-in-modal";
 import { SignupModal } from "./features/login/components/signup-modal";
 import { Logo } from "./components/icons/logo";
 import { Link } from "react-router-dom";
+import { ProtectedRoute } from "./features/auth/components/protected-route";
+import { Toaster } from "sonner";
 
 import { ScrollToTop } from "./components/scroll-to-top";
 
@@ -43,12 +45,14 @@ function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/loans/apply" element={<LoanApplicationPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
           <Route path="/loans" element={<LoansPage />} />
-          <Route path="/loans/apply" element={<LoanApplicationPage />} />
           <Route path="/docs" element={<DocsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </main>
 
@@ -102,9 +106,14 @@ function App() {
         </div>
       </footer>
 
+
+
+
+
       {/* Auth Modals */}
       <SignInModal />
       <SignupModal />
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

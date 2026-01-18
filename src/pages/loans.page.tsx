@@ -7,8 +7,12 @@ import LoanSearchForm from "@/features/loans/components/loan-search-form";
 import { getQuotes } from "@/features/loans/api/loans-api";
 import { ChevronDown, Loader2 } from "lucide-react";
 
+import { useAuth } from "@/hooks";
+import { toast } from "sonner";
+
 function LoansPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [offers, setOffers] = useState<LoanOfferData[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -51,6 +55,12 @@ function LoansPage() {
   };
 
   const handleSelectOffer = (offer: LoanOfferData) => {
+    if (!isAuthenticated) {
+        toast.error("Authentication Required", {
+            description: "You need to be logged in to apply for a loan."
+        });
+        return;
+    }
     navigate("/loans/apply", { state: { offer } });
   };
 
