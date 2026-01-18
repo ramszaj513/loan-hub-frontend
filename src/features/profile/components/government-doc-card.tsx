@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { FormData } from "../types/profile.types";
-import { DOCUMENT_TYPES } from "../types/profile.types";
+import { GOVERNMENT_DOC_TYPES } from "@/features/loans/constants/loan-options";
 
 interface GovernmentDocCardProps {
   formData: FormData;
@@ -47,11 +47,11 @@ export function GovernmentDocCard({
               }
               disabled={disabled}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select document type" />
               </SelectTrigger>
               <SelectContent>
-                {DOCUMENT_TYPES.map((type) => (
+                {GOVERNMENT_DOC_TYPES.map((type) => (
                   <SelectItem key={type.id} value={String(type.id)}>
                     {type.name}
                   </SelectItem>

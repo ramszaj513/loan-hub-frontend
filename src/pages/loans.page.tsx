@@ -37,8 +37,8 @@ function LoansPage() {
           apr: 5.5, 
           maxAmount: amount,
           termRange: `${months} mo`,
-          monthlyInstallment: quote.monthlyInstallment,
-          currency: quote.currency
+          monthlyInstallment: quote.monthlyInstallment.amount,
+          currency: quote.monthlyInstallment.currencyCode
         };
       });
 

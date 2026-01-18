@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { applyForLoan, type LoanApplicationRequest } from "@/features/loans/api/loans-api";
 import { type LoanOfferData } from "./loan-offer";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { JOB_TYPES, GOVERNMENT_DOC_TYPES, CURRENCIES } from "@/features/loans/constants/loan-options";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 interface LoanApplicationFormProps {
@@ -18,21 +26,22 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<Omit<LoanApplicationRequest, 'externalQuoteId'>>({
+  const [formData, setFormData] = useState<Omit<LoanApplicationRequest, 'externalQuoteId' | 'bankName'>>({
     firstName: "",
     lastName: "",
     birthDate: "",
-    governmentDocTypeId: 1, // Default to 1 as we don't have types enum
+    governmentDocTypeId: 1,
     governmentDocNumber: "",
-    jobTypeId: 1, // Default to 1
+    jobTypeId: 1,
     jobStartDate: "",
-    incomeAmount: 0,
-    currency: offer.currency, // Use offer currency
+    income: {
+      amount: 0,
+      currencyCode: offer.currency
+    },
   });
 
   // Autofill effect
   useEffect(() => {
-    console.log("Autofill Check - Authenticated:", isAuthenticated, "User:", user);
     if (isAuthenticated && user?.userData) {
       const { 
         firstName, 
@@ -65,18 +74,31 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
         governmentDocNumber: governmentDocumentNumber || "",
         jobTypeId: jobTypeId || 1,
         jobStartDate: safeFormatDate(jobStartDate),
-        incomeAmount: incomeAmount || 0,
-        currency: incomeCurrency || offer.currency
+        income: {
+            amount: incomeAmount || 0,
+            currencyCode: incomeCurrency || offer.currency
+        }
       }));
     }
   }, [isAuthenticated, user, offer.currency]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? Number(value) : value
-    }));
+    
+    if (name === "incomeAmount") {
+        setFormData(prev => ({
+            ...prev,
+            income: {
+                ...prev.income,
+                amount: Number(value)
+            }
+        }));
+    } else {
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'number' ? Number(value) : value
+        }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,13 +107,13 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
     setError(null);
 
     try {
-      // submission
       const isoBirthDate = formData.birthDate ? new Date(formData.birthDate).toISOString() : new Date().toISOString(); 
       const isoJobStartDate = formData.jobStartDate ? new Date(formData.jobStartDate).toISOString() : new Date().toISOString();
 
       const requestData: LoanApplicationRequest = {
         ...formData,
         externalQuoteId: offer.id,
+        bankName: offer.bankName,
         birthDate: isoBirthDate,
         jobStartDate: isoJobStartDate,
       };
@@ -192,15 +214,24 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
           {/* Docs */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="governmentDocTypeId">Doc Type ID</Label>
-              <Input
-                id="governmentDocTypeId"
-                name="governmentDocTypeId"
-                type="number"
-                value={formData.governmentDocTypeId}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="governmentDocTypeId">Doc Type</Label>
+              <Select
+                value={formData.governmentDocTypeId?.toString()}
+                onValueChange={(value) => {
+                    if (value) setFormData(prev => ({ ...prev, governmentDocTypeId: Number(value) }))
+                }}
+              >
+                  <SelectTrigger id="governmentDocTypeId" className="w-full">
+                      <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {GOVERNMENT_DOC_TYPES.map((type) => (
+                          <SelectItem key={type.id} value={type.id.toString()}>
+                              {type.name}
+                          </SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="governmentDocNumber">Document Number</Label>
@@ -217,15 +248,24 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
           {/* Job & Income */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="jobTypeId">Job Type ID</Label>
-              <Input
-                id="jobTypeId"
-                name="jobTypeId"
-                type="number"
-                value={formData.jobTypeId}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="jobTypeId">Job Type</Label>
+               <Select
+                value={formData.jobTypeId?.toString()}
+                onValueChange={(value) => {
+                    if (value) setFormData(prev => ({ ...prev, jobTypeId: Number(value) }))
+                }}
+              >
+                  <SelectTrigger id="jobTypeId" className="w-full">
+                      <SelectValue placeholder="Select Job" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                      {JOB_TYPES.map((type) => (
+                          <SelectItem key={type.id} value={type.id.toString()}>
+                              {type.name}
+                          </SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="jobStartDate">Job Start Date</Label>
@@ -241,15 +281,40 @@ export function LoanApplicationForm({ offer }: LoanApplicationFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="incomeAmount">Annual Income ({offer.currency})</Label>
-            <Input
-              id="incomeAmount"
-              name="incomeAmount"
-              type="number"
-              value={formData.incomeAmount}
-              onChange={handleChange}
-              required
-            />
+            <Label htmlFor="incomeAmount">Annual Income</Label>
+            <div className="flex gap-2">
+                <div className="flex-1">
+                    <Input
+                    id="incomeAmount"
+                    name="incomeAmount"
+                    type="number"
+                    value={formData.income.amount}
+                    onChange={handleChange}
+                    required
+                    />
+                </div>
+                <div className="w-[120px]">
+                    <Select
+                        value={formData.income.currencyCode}
+                        onValueChange={(value) => {
+                            if (value) setFormData(prev => ({ 
+                            ...prev, 
+                            income: { ...prev.income, currencyCode: value } 
+                        }))}}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {CURRENCIES.map((currency) => (
+                                <SelectItem key={currency.code} value={currency.code}>
+                                    {currency.code}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
           </div>
 
           {error && (

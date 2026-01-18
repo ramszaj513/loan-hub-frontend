@@ -1,19 +1,28 @@
-
 export interface QuoteRequest {
     amount: number;
     termInMonths: number;
     currency: string;
 }
 
+export interface QuoteResponseMonthlyInstallment {
+    amount: number;
+    currencyCode: string;
+}
+
 export interface QuoteResponse {
     bankName: string;
-    monthlyInstallment: number;
     externalQuoteId: string;
-    currency: string;
+    monthlyInstallment: QuoteResponseMonthlyInstallment;
+}
+
+export interface LoanApplicationRequestIncome {
+    amount: number;
+    currencyCode: string;
 }
 
 export interface LoanApplicationRequest {
     externalQuoteId: string;
+    bankName: string;
     firstName: string;
     lastName: string;
     birthDate: string;
@@ -22,14 +31,34 @@ export interface LoanApplicationRequest {
     jobTypeId: number;
     jobStartDate: string;
     jobEndDate?: string;
-    incomeAmount: number;
-    currency: string;
+    income: LoanApplicationRequestIncome;
+}
+
+export interface LoanApplicationResponseMonthlyInstallment {
+    amount: number;
+    currencyCode: string;
+}
+
+export interface LoanApplicationResponseRequestedAmount {
+    amount: number;
+    currencyCode: string;
 }
 
 export interface LoanApplicationResponse {
-    externalOfferId: string;
-    submissionDate: string;
-    success: boolean;
+    id: number;
+    percentage: number;
+    bankName: string;
+    monthlyInstallment: LoanApplicationResponseMonthlyInstallment;
+    requestedAmount: LoanApplicationResponseRequestedAmount;
+    requestedPeriodInMonth: number;
+    statusId: number;
+    statusDescription: string;
+    inquireId: number;
+    createDate: string;
+    updateDate: string;
+    approvedBy: string | null;
+    documentLink: string | null;
+    documentLinkValidDate: string | null;
 }
 
 const baseUrl = import.meta.env.VITE_API_URL || "";
@@ -41,9 +70,9 @@ const getAuthHeaders = (): Record<string, string> => {
 
 export const getQuotes = async (params: QuoteRequest): Promise<QuoteResponse[]> => {
     const queryParams = new URLSearchParams({
-        Amount: params.amount.toString(),
-        TermInMonths: params.termInMonths.toString(),
-        Currency: params.currency,
+        "RequestedAmount.Amount": params.amount.toString(),
+        "RequestedAmount.CurrencyCode": params.currency,
+        "TermInMonths": params.termInMonths.toString(),
     });
 
     const response = await fetch(`${baseUrl}/api/Loans/quotes?${queryParams.toString()}`, {
@@ -61,34 +90,15 @@ export const getQuotes = async (params: QuoteRequest): Promise<QuoteResponse[]> 
     return response.json();
 };
 
-const currencyToEnumIndex: Record<string, number> = {
-    "USD": 0, "EUR": 1, "GBP": 2, "JPY": 3, "AUD": 4,
-    "CAD": 5, "CHF": 6, "CNY": 7, "SEK": 8, "NZD": 9
-};
-
 export const applyForLoan = async (data: LoanApplicationRequest): Promise<LoanApplicationResponse> => {
-    const applicationData = {
-        ExternalQuoteId: data.externalQuoteId,
-        FirstName: data.firstName,
-        LastName: data.lastName,
-        BirthDate: data.birthDate,
-        GovernmentDocTypeId: data.governmentDocTypeId,
-        GovernmentDocNumber: data.governmentDocNumber,
-        JobTypeId: data.jobTypeId,
-        JobStartDate: data.jobStartDate,
-        JobEndDate: data.jobEndDate || null,
-        IncomeAmount: data.incomeAmount,
-        Currency: currencyToEnumIndex[data.currency] ?? 0
-    };
-
-    const response = await fetch(`${baseUrl}/api/Loans/apply`, {
+    const response = await fetch(`${baseUrl}/api/Loans/applications`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Accept": "text/plain",
             ...getAuthHeaders(),
         },
-        body: JSON.stringify(applicationData),
+        body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -99,26 +109,11 @@ export const applyForLoan = async (data: LoanApplicationRequest): Promise<LoanAp
     return response.json();
 };
 
-export const BankOfferStatus = {
-    Pending: 0,
-    Approved: 1,
-    Rejected: 2,
-    RequiresMoreInfo: 3
-} as const;
-
-export type BankOfferStatus = typeof BankOfferStatus[keyof typeof BankOfferStatus];
-
-export interface ApplicationStatus {
-    status: BankOfferStatus;
-    description: string | null;
-    lastUpdated: string;
-}
-
-export const getUserApplications = async (): Promise<ApplicationStatus[]> => {
+export const getUserApplications = async (): Promise<LoanApplicationResponse[]> => {
     const response = await fetch(`${baseUrl}/api/Loans/applications`, {
         method: "GET",
         headers: {
-            "Accept": "application/json",
+            "Accept": "text/plain",
             ...getAuthHeaders(),
         },
     });
@@ -130,11 +125,11 @@ export const getUserApplications = async (): Promise<ApplicationStatus[]> => {
     return response.json();
 };
 
-export const getApplicationStatus = async (applicationId: string): Promise<ApplicationStatus> => {
+export const getApplicationStatus = async (applicationId: string): Promise<LoanApplicationResponse> => {
     const response = await fetch(`${baseUrl}/api/Loans/applications/${applicationId}`, {
         method: "GET",
         headers: {
-            "Accept": "application/json",
+            "Accept": "text/plain",
             ...getAuthHeaders(),
         },
     });

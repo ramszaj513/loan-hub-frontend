@@ -34,12 +34,14 @@ export function LoanOfferCard({ offer, onSelect }: LoanOfferCardProps) {
           <h3 className="font-semibold">{offer.bankName}</h3>
         </div>
 
-        {/* APR - Centered */}
+        {/* Monthly Installment - Centered */}
         <div className="text-center py-2">
           <p className="text-xs text-muted-foreground uppercase tracking-wider">
-            APR As Low As
+            Monthly Installment
           </p>
-          <p className="text-3xl font-bold text-primary">{offer.apr}%</p>
+          <p className="text-3xl font-bold text-primary">
+            {offer.monthlyInstallment ? offer.monthlyInstallment.toLocaleString() : "—"} <span className="text-lg font-normal text-muted-foreground">{offer.currency || "USD"} / mo</span>
+          </p>
         </div>
 
         {/* Loan Details */}

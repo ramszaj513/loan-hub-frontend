@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { FormData } from "../types/profile.types";
-import { JOB_TYPES } from "../types/profile.types";
+import { JOB_TYPES } from "@/features/loans/constants/loan-options";
 
 interface EmploymentCardProps {
   formData: FormData;
@@ -44,7 +44,7 @@ export function EmploymentCard({
             }
             disabled={disabled}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select employment type" />
             </SelectTrigger>
             <SelectContent>

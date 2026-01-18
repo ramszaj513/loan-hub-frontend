@@ -24,7 +24,7 @@ import type { FormData } from "@/features/profile/types/profile.types";
 import { emptyFormData } from "@/features/profile/types/profile.types";
 
 function ProfilePage() {
-  const { isAuthenticated, user, showLoginModal } = useAuth();
+  const { isAuthenticated, user, showLoginModal, updateUserData: updateAuthUserData } = useAuth();
   const [userData, setUserData] = useState<UserDataDto | null>(null);
   const [formData, setFormData] = useState<FormData>(emptyFormData);
   const [isEditing, setIsEditing] = useState(false);
@@ -89,11 +89,15 @@ function ProfilePage() {
       };
 
       if (userData) {
-        const updated = await updateUserData(dataToSave);
-        setUserData(updated);
+        await updateUserData(dataToSave);
       } else {
-        const created = await createUserData(dataToSave);
-        setUserData(created);
+        await createUserData(dataToSave);
+      }
+
+      const freshData = await getUserData();
+      if (freshData) {
+        setUserData(freshData);
+        updateAuthUserData(freshData);
       }
 
       setIsEditing(false);

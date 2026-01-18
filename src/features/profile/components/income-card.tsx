@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { FormData } from "../types/profile.types";
-import { CURRENCIES } from "../types/profile.types";
+import { CURRENCIES } from "@/features/loans/constants/loan-options";
 
 interface IncomeCardProps {
   formData: FormData;
@@ -60,13 +60,13 @@ export function IncomeCard({
               }
               disabled={disabled}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
               <SelectContent>
                 {CURRENCIES.map((currency) => (
-                  <SelectItem key={currency} value={currency}>
-                    {currency}
+                  <SelectItem key={currency.code} value={currency.code}>
+                    {currency.code}
                   </SelectItem>
                 ))}
               </SelectContent>

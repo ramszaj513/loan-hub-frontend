@@ -21,6 +21,32 @@ export interface UserDataDto {
   incomeCurrency: string;
 }
 
+export interface CreateUserDataDto {
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  governmentDocumentTypeId: number;
+  governmentDocumentNumber: string;
+  jobTypeId: number;
+  jobStartDate: string;
+  jobEndDate?: string | null;
+  incomeAmount: number;
+  incomeCurrency: string;
+}
+
+export interface UpdateUserDataDto {
+  firstName?: string | null;
+  lastName?: string | null;
+  birthDate?: string | null;
+  governmentDocumentTypeId?: number | null;
+  governmentDocumentNumber?: string | null;
+  jobTypeId?: number | null;
+  jobStartDate?: string | null;
+  jobEndDate?: string | null;
+  incomeAmount?: number | null;
+  incomeCurrency?: string | null;
+}
+
 export async function getUserData(): Promise<UserDataDto | null> {
   const response = await fetch(`${API_URL}/api/Users/data`, {
     method: "GET",
@@ -38,7 +64,7 @@ export async function getUserData(): Promise<UserDataDto | null> {
   return await response.json();
 }
 
-export async function createUserData(data: UserDataDto): Promise<UserDataDto> {
+export async function createUserData(data: CreateUserDataDto): Promise<UserDataDto> {
   const response = await fetch(`${API_URL}/api/Users/data`, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -52,7 +78,7 @@ export async function createUserData(data: UserDataDto): Promise<UserDataDto> {
   return await response.json();
 }
 
-export async function updateUserData(data: UserDataDto): Promise<UserDataDto> {
+export async function updateUserData(data: UpdateUserDataDto): Promise<UserDataDto> {
   const response = await fetch(`${API_URL}/api/Users/data`, {
     method: "PUT",
     headers: getAuthHeaders(),

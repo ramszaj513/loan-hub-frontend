@@ -2,8 +2,15 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { 
+    Dialog, 
+    DialogContent, 
+    DialogHeader, 
+    DialogTitle, 
+    DialogDescription 
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks";
-import { getUserApplications, BankOfferStatus, type ApplicationStatus } from "@/features/loans/api/loans-api";
+import { getUserApplications, type LoanApplicationResponse } from "@/features/loans/api/loans-api";
 import { 
   FileText, 
   Clock, 
@@ -12,14 +19,24 @@ import {
   AlertCircle,
   ArrowRight,
   Loader2,
-  Inbox
+  Inbox,
+  CalendarDays,
+  Wallet
 } from "lucide-react";
+
+const BankOfferStatus = {
+    Pending: 0,
+    Approved: 1,
+    Rejected: 2,
+    RequiresMoreInfo: 3
+} as const;
 
 function DashboardPage() {
   const { user } = useAuth();
-  const [applications, setApplications] = useState<ApplicationStatus[]>([]);
+  const [applications, setApplications] = useState<LoanApplicationResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedApp, setSelectedApp] = useState<LoanApplicationResponse | null>(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -40,13 +57,13 @@ function DashboardPage() {
   // Calculate stats
   const stats = {
     total: applications.length,
-    pending: applications.filter(a => a.status === BankOfferStatus.Pending).length,
-    approved: applications.filter(a => a.status === BankOfferStatus.Approved).length,
-    rejected: applications.filter(a => a.status === BankOfferStatus.Rejected).length,
+    pending: applications.filter(a => a.statusId === BankOfferStatus.Pending).length,
+    approved: applications.filter(a => a.statusId === BankOfferStatus.Approved).length,
+    rejected: applications.filter(a => a.statusId === BankOfferStatus.Rejected).length,
   };
 
-  const getStatusConfig = (status: BankOfferStatus) => {
-    switch (status) {
+  const getStatusConfig = (statusId: number) => {
+    switch (statusId) {
       case BankOfferStatus.Approved:
         return { 
           label: "Approved", 
@@ -81,6 +98,8 @@ function DashboardPage() {
         };
     }
   };
+
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -212,33 +231,66 @@ function DashboardPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {applications.map((app, index) => {
-                    const config = getStatusConfig(app.status);
+                    const config = getStatusConfig(app.statusId);
                     const StatusIcon = config.icon;
+                    const bankName = app.bankName || "Unknown Bank";
                     
                     return (
                       <div 
                         key={index}
-                        className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border"
                       >
-                        <div className={`w-3 h-3 rounded-full ${config.dotClass} flex-shrink-0`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bgClass} ${config.textClass}`}>
-                              <StatusIcon className="h-3 w-3" />
-                              {config.label}
-                            </span>
-                          </div>
-                          {app.description && (
-                            <p className="text-sm text-muted-foreground mt-1 truncate">
-                              {app.description}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground flex-shrink-0">
-                          {formatDate(app.lastUpdated)}
-                        </div>
+                         <div className="flex items-center gap-4">
+                            {/* Status Icon on Left */}
+                            <div className={`p-2 rounded-full ${config.bgClass} ${config.textClass} flex-shrink-0`}>
+                                <StatusIcon className="h-5 w-5" />
+                            </div>
+                            
+                            <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+                                {/* Bank & Amount Group */}
+                                <div className="space-y-1">
+                                    <div className="text-sm font-medium text-muted-foreground">
+                                        {bankName}
+                                    </div>
+                                    <div className="text-lg font-bold">
+                                        {app.requestedAmount.amount.toLocaleString()} {app.requestedAmount.currencyCode}
+                                    </div>
+                                </div>
+                                
+                                {/* Term & Rate Group - Moved Closer to Left */}
+                                <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-2">
+                                        <CalendarDays className="h-4 w-4" />
+                                        <span>{app.requestedPeriodInMonth} Months</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Wallet className="h-4 w-4" />
+                                        <span>
+                                            {app.monthlyInstallment.amount.toLocaleString()} {app.monthlyInstallment.currencyCode} / mo
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+
+                         <div className="flex items-center justify-between sm:justify-end gap-6 w-full md:w-auto">
+                             {/* Updated Time - Moved to Right */}
+                             <div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
+                                <Clock className="h-4 w-4" />
+                                <span>Updated {formatDate(app.updateDate)}</span>
+                            </div>
+
+                             <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => setSelectedApp(app)}
+                                className="shrink-0"
+                             >
+                                View Details
+                             </Button>
+                         </div>
                       </div>
                     );
                   })}
@@ -246,9 +298,94 @@ function DashboardPage() {
               )}
             </CardContent>
           </Card>
-
         </div>
       </section>
+
+      {/* Details Dialog */}
+      <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
+        <DialogContent className="max-w-lg">
+            <DialogHeader>
+                <DialogTitle>Application Details</DialogTitle>
+                <DialogDescription>
+                    Full details for your loan application.
+                </DialogDescription>
+            </DialogHeader>
+            
+            {selectedApp && (
+                <div className="space-y-6 pt-4">
+                     {/* Key Figures */}
+                    <div className="grid grid-cols-2 gap-4">
+                         <div className="p-4 rounded-lg bg-muted/40 space-y-1">
+                             <div className="text-xs text-muted-foreground uppercase tracking-wider">Amount</div>
+                             <div className="text-2xl font-bold flex items-baseline gap-1">
+                                {selectedApp.requestedAmount.amount.toLocaleString()}
+                                <span className="text-sm font-normal text-muted-foreground">{selectedApp.requestedAmount.currencyCode}</span>
+                             </div>
+                         </div>
+                         <div className="p-4 rounded-lg bg-muted/40 space-y-1">
+                             <div className="text-xs text-muted-foreground uppercase tracking-wider">Monthly Pmt</div>
+                             <div className="text-2xl font-bold flex items-baseline gap-1">
+                                {selectedApp.monthlyInstallment.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                <span className="text-sm font-normal text-muted-foreground">{selectedApp.monthlyInstallment.currencyCode}</span>
+                             </div>
+                         </div>
+                    </div>
+
+                    {/* Secondary Figures */}
+                    <div className="grid grid-cols-3 gap-4">
+                         <div className="p-3 rounded-lg bg-muted/40 space-y-1">
+                             <div className="text-xs text-muted-foreground uppercase tracking-wider">Term</div>
+                             <div className="font-semibold">{selectedApp.requestedPeriodInMonth} mo</div>
+                         </div>
+                         <div className="p-3 rounded-lg bg-muted/40 space-y-1">
+                             <div className="text-xs text-muted-foreground uppercase tracking-wider">Rate</div>
+                             <div className="font-semibold">{selectedApp.percentage}%</div>
+                         </div>
+                         <div className="p-3 rounded-lg bg-muted/40 space-y-1">
+                             <div className="text-xs text-muted-foreground uppercase tracking-wider">Status</div>
+                             <div className={`font-semibold ${getStatusConfig(selectedApp.statusId).textClass}`}>
+                                {getStatusConfig(selectedApp.statusId).label}
+                             </div>
+                         </div>
+                    </div>
+
+                    {/* Dates Footer */}
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+                        <div>Created {new Date(selectedApp.createDate).toLocaleDateString()}</div>
+                        <div>Updated {new Date(selectedApp.updateDate).toLocaleString()}</div>
+                    </div>
+
+                    {/* Additional Details */}
+                    <div className="space-y-4">
+
+
+                        
+                        {selectedApp.approvedBy && (
+                            <div className="pt-2 border-t">
+                                <span className="text-muted-foreground block text-xs mb-1">Approved By</span>
+                                <p className="text-sm font-medium">{selectedApp.approvedBy}</p>
+                            </div>
+                        )}
+                        
+                         {selectedApp.documentLink && (
+                            <div className="pt-4">
+                                <Button className="w-full" asChild>
+                                    <a href={selectedApp.documentLink} target="_blank" rel="noopener noreferrer">
+                                        <FileText className="mr-2 h-4 w-4" /> View Loan Document
+                                    </a>
+                                </Button>
+                                {selectedApp.documentLinkValidDate && (
+                                     <p className="text-xs text-center text-muted-foreground mt-2">
+                                        Link valid until {new Date(selectedApp.documentLinkValidDate).toLocaleDateString()}
+                                     </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

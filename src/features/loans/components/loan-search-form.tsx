@@ -21,6 +21,7 @@ const currencies = [
   { value: "EUR", symbol: "€", label: "EUR" },
   { value: "GBP", symbol: "£", label: "GBP" },
   { value: "PLN", symbol: "zł", label: "PLN" },
+  { value: "CHF", symbol: "₣", label: "CHF" },
 ];
 
 function LoanSearchForm({ onSearch }: LoanSearchFormProps) {
@@ -112,7 +113,7 @@ function LoanSearchForm({ onSearch }: LoanSearchFormProps) {
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>{currentCurrency?.symbol}1,000</span>
-                <span>{currentCurrency?.symbol}100,000</span>
+                <span>{currentCurrency?.symbol}1,000,000</span>
               </div>
             </div>
 

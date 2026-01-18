@@ -63,69 +63,6 @@ function DocsPage() {
             </CardContent>
           </Card>
         </div>
-        
-        {/* Loan Types  */}
-        <div className="max-w-3xl mx-auto">
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle>Available Loan Types</CardTitle>
-              <CardDescription>
-                Choose the right loan for your needs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-2">
-                    Personal Loans
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Quick funding for personal expenses
-                  </p>
-                  <div className="text-xs text-muted-foreground">
-                    • 5.5% APR • $1K-$50K • 24hr approval
-                  </div>
-                </div>
-
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-2">
-                    Auto Loans
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Financing for new and used vehicles
-                  </p>
-                  <div className="text-xs text-muted-foreground">
-                    • 4.2% APR • $5K-$100K • Same day
-                  </div>
-                </div>
-
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-2">
-                    Home Loans
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Mortgages and refinancing options
-                  </p>
-                  <div className="text-xs text-muted-foreground">
-                    • 3.8% APR • $50K-$1M • 7-14 days
-                  </div>
-                </div>
-
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-semibold mb-2">
-                    Business Loans
-                  </h4>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Capital for business growth
-                  </p>
-                  <div className="text-xs text-muted-foreground">
-                    • 6.0% APR • $10K-$500K • 3-5 days
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   )
