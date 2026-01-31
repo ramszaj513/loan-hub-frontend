@@ -28,6 +28,7 @@ steps:
   env:
     VITE_API_URL: $(VITE_API_URL)
     VITE_GOOGLE_CLIENT_ID: $(VITE_GOOGLE_CLIENT_ID)
+    VITE_IN_HOUSE_API_URL: $(VITE_INHOUSE_API_URL)
 
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure'
