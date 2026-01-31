@@ -5,17 +5,36 @@
 
 trigger:
 - master
+- feature/CD
 
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  azureServiceConnection: 'uamanagedidentity'
+  webAppName: 'loanhub-frontend'
+  VITE_API_URL: 'https://loanhub-backend.azurewebsites.net'
+
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+    versionSpec: '22.x'
 
 - script: |
     npm install
     npm run build
-  displayName: 'npm install and build'
+    zip -r $(Build.ArtifactStagingDirectory)/app.zip dist package.json package-lock.json
+  displayName: 'Build and Zip'
+  env:
+    VITE_API_URL: $(VITE_API_URL)
+    VITE_GOOGLE_CLIENT_ID: $(VITE_GOOGLE_CLIENT_ID)
+    VITE_IN_HOUSE_API_URL: $(VITE_INHOUSE_API_URL)
+
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure'
+  inputs:
+    azureSubscription: '$(azureServiceConnection)'
+    appType: 'webAppLinux'
+    appName: '$(webAppName)'
+    package: '$(Build.ArtifactStagingDirectory)/app.zip'
+    startUpCommand: 'npm install --production && npm start'
