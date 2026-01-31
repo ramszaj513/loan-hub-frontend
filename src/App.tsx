@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import HomePage from "./pages/home.page";
 import DashboardPage from "./pages/dashboard.page";
@@ -8,6 +8,7 @@ import LoanApplicationPage from "./pages/loan-application.page";
 import DocsPage from "./pages/docs.page";
 import SettingsPage from "./pages/settings.page";
 import ProfilePage from "./pages/profile.page";
+import AdminPage from "./pages/admin.page";
 import NavigationMenuComponent from "./features/navigation/components/navigation-menu";
 import ProfileMenu from "./features/navigation/components/profile-menu";
 import { SignInModal } from "./features/login/components/sign-in-modal";
@@ -19,17 +20,7 @@ import { Toaster } from "sonner";
 
 import { ScrollToTop } from "./components/scroll-to-top";
 
-function App() {
-  // Initialize theme on app load
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
+function MainLayout() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <ScrollToTop />
@@ -106,16 +97,42 @@ function App() {
         </div>
       </footer>
 
-
-
-
-
       {/* Auth Modals */}
       <SignInModal />
       <SignupModal />
-      <Toaster position="top-right" richColors />
     </div>
   );
 }
 
+function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname === "/admin";
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  if (isAdminRoute) {
+    return (
+      <>
+        <AdminPage />
+        <Toaster position="top-right" richColors />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <MainLayout />
+      <Toaster position="top-right" richColors />
+    </>
+  );
+}
+
 export default App;
+
