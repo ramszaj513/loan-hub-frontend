@@ -2,6 +2,8 @@
 
 A modern, fast, and beautiful frontend for LoanHub, built with React, Vite, and Tailwind CSS.
 
+https://loanhub-frontend.azurewebsites.net/
+
 ## Major Dependencies
 
 - **React** 19
